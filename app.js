@@ -83,26 +83,24 @@ const realm = await Realm.open({
     schema: [User, Food, FoodEntry, FoodEntries, Configuration, ExercicesInfo, GlucoseInfo, InsulinInfo],
 }); 
 
-let bannana, apple;
-
-let FoodEntry1;
-realm.write(() => {
-    bannana = realm.create("Food", {
-        name: "Bannana",
-        calories: 100,
-        carbohydrates: 10,
-        protein: 4,
-        fat: 3
-    });
-    //apple = realm.create("Food", {
-    //    name: "Apple",
-    //    calories: 80,
-    //    carbohydrates: 30,
-    //    protein: 6,
-    //    fat: 10
-    //});
-    FoodEntry1 = realm.create("FoodEntry", {
-        food: bannana,
-        amount: 10
-    })
-});
+//let bannana, apple, FoodEntry1;
+//realm.write(() => {
+//    bannana = realm.create("Food", {
+//        name: "Bannana",
+//        calories: 100,
+//        carbohydrates: 10,
+//        protein: 4,
+//        fat: 3
+//    });
+//    apple = realm.create("Food", {
+//        name: "Apple",
+//        calories: 80,
+//        carbohydrates: 30,
+//        protein: 6,
+//        fat: 10
+//    });
+//    FoodEntry1 = realm.create("FoodEntry", {
+//        food: bannana,
+//        amount: 10
+//    })
+//});
