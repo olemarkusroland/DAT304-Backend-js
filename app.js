@@ -1,4 +1,7 @@
 import Realm from 'realm';
+import { nightscoutGET } from './nightscoutAPI.js'
+
+nightscoutGET();
 
 const User = {
     name: "User",
@@ -98,7 +101,7 @@ const realm = await Realm.open({
 //        carbohydrates: 30,
 //        protein: 6,
 //        fat: 10
-//    });
+//    }); 
 //    FoodEntry1 = realm.create("FoodEntry", {
 //        food: bannana,
 //        amount: 10
