@@ -1,7 +1,9 @@
 import Realm from 'realm';
 import { nightscoutGET } from './nightscoutAPI.js'
+import { realmTest } from './realm.js'
 
 nightscoutGET();
+//realmTest();
 
 const User = {
     name: "User",
