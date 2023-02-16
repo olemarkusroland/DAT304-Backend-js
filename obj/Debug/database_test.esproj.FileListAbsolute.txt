@@ -2,3 +2,5 @@ C:\Users\Yea\DAT304\Projects\database_test\obj\Debug\database_test.esproj.Sugges
 C:\Users\Yea\DAT304\Projects\database_test\obj\Debug\database_test.esproj.CoreCompileInputs.cache
 C:\Users\Yea\DAT304\Projects\js test\obj\Debug\database_test.esproj.SuggestedBindingRedirects.cache
 C:\Users\Yea\DAT304\Projects\js test\obj\Debug\database_test.esproj.CoreCompileInputs.cache
+C:\Users\Yea\DAT304\Projects\backend js\obj\Debug\database_test.esproj.SuggestedBindingRedirects.cache
+C:\Users\Yea\DAT304\Projects\backend js\obj\Debug\database_test.esproj.CoreCompileInputs.cache
