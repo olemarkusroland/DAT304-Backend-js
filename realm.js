@@ -1,18 +1,19 @@
 import Realm from 'realm';
+import { glucoseGET } from './nightscoutAPI.js'
 
-export function realmTest() {
-    const User = {
-        name: "User",
-        properties: {
-            id: "int",
-            name: "string",
-            email: "string",
-            Age: "int",
-        },
-        primaryKey: "id",
-    };
+const User = {
+    name: "User",
+    properties: {
+        id: "int",
+        name: "string",
+        email: "string",
+        Age: "int",
+    },
+    primaryKey: "id",
+};
 
-    const Food = {
+class Food extends Realm.Object {
+    static schema = {
         name: "Food",
         properties: {
             name: "string",
@@ -23,8 +24,10 @@ export function realmTest() {
         },
         primaryKey: "name",
     };
+}
 
-    const FoodEntry = {
+class FoodEntry extends Realm.Object {
+    static schema = {
         name: "FoodEntry",
         properties: {
             //_id: "int",
@@ -33,8 +36,10 @@ export function realmTest() {
         },
         //primaryKey: "_id",
     };
+}
 
-    const FoodEntries = {
+class FoodEntries extends Realm.Object {
+    static schema = {
         name: "FoodEntries",
         properties: {
             //_id: "int",
@@ -43,8 +48,10 @@ export function realmTest() {
         },
         //primaryKey: "_id",
     };
+}
 
-    const Configuration = {
+class Configuration extends Realm.Object {
+    static schema = {
         name: "Configuration",
         properties: {
             nightscoutAPI: "string",
@@ -54,55 +61,63 @@ export function realmTest() {
             GPU: "bool"
         },
     };
+}
 
-    const ExercicesInfo = {
+class ExercicesInfo extends Realm.Object {
+    static schema = {
         name: "ExercicesInfo",
         properties: {
             caloriesBurned: "float",
             timestamp: "string"
         }
     }
+}
 
-    const GlucoseInfo = {
+export class GlucoseInfo extends Realm.Object {
+    static schema = {
         name: "GlucoseInfo",
         properties: {
             glucose: "float",
             timestamp: "string"
         }
     }
+}
 
-    const InsulinInfo = {
+class InsulinInfo extends Realm.Object {
+    static schema = {
         name: "InsulinInfo",
         properties: {
             insulin: "float",
             timestamp: "string"
         }
     }
-
-    const realm = await Realm.open({
-        path: "my.realm",
-        schema: [User, Food, FoodEntry, FoodEntries, Configuration, ExercicesInfo, GlucoseInfo, InsulinInfo],
-    });
-
-    //let bannana, apple, FoodEntry1;
-    //realm.write(() => {
-    //    bannana = realm.create("Food", {
-    //        name: "Bannana",
-    //        calories: 100,
-    //        carbohydrates: 10,
-    //        protein: 4,
-    //        fat: 3
-    //    });
-    //    apple = realm.create("Food", {
-    //        name: "Apple",
-    //        calories: 80,
-    //        carbohydrates: 30,
-    //        protein: 6,
-    //        fat: 10
-    //    });
-    //    FoodEntry1 = realm.create("FoodEntry", {
-    //        food: bannana,
-    //        amount: 10
-    //    })
-    //});
 }
+
+const realm = await Realm.open({
+    path: "my.realm",
+    schema: [User, Food, FoodEntry, FoodEntries, Configuration, ExercicesInfo, GlucoseInfo, InsulinInfo],
+});
+
+export function realmTest() {
+    const foods = realm.objects("Food");
+    for (const food of foods) {
+        console.log(food.name);
+    }
+};
+
+export function readLatestGlucose() {
+    let glucoseInfos = realm.objects("GlucoseInfo");
+    glucoseInfos = glucoseInfos.sorted("timestamp", true);
+
+    return glucoseInfos[0];
+};
+
+export async function updateGlucose() {
+    const fromDate = readLatestGlucose().timestamp;
+    var result = await glucoseGET(fromDate);
+
+    realm.write(() => {
+        for (const glucoseInfo of result)
+            realm.create("GlucoseInfo", { glucose: glucoseInfo.glucose, timestamp: glucoseInfo.timestamp });
+    });
+};
