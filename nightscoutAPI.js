@@ -22,22 +22,16 @@ export function nightscoutTest() {
     });
 }
 
-function parseISOString(s) {
-    var b = s.split(/\D+/);
-    return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
-}
+
 
 export async function glucoseGET(fromDate) {
-    console.log(fromDate);
     const currentDate = new Date();
-    
-    const test = parseISOString(fromDate)
-    console.log(test)
 
-    const fromDatePlus = new Date(test + 5 * 60000);
-    console.log(fromDatePlus);
+    let fromDatePlus = new Date(fromDate);
+    fromDatePlus.setMinutes(fromDatePlus.getMinutes() + 5);
 
-    const order = "/api/v1/entries/sgv.json?find[dateString][$gte]=" + fromDatePlus + "&find[dateString][$lte]=" + currentDate.toISOString() + "&count=all";
+    const order = "/api/v1/entries/sgv.json?find[dateString][$gte]=" + fromDatePlus.toISOString() + "&find[dateString][$lte]=" + currentDate.toISOString() + "&count=all";
+    console.log(order);
 
     return new Promise(function (resolve, reject) {
         https.get(url + order, (res) => {
