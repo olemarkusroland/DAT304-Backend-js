@@ -107,17 +107,28 @@ export function realmTest() {
 
 export function readLatestGlucose() {
     let glucoseInfos = realm.objects("GlucoseInfo");
+
+    if (glucoseInfos.isEmpty())
+        return null;
+
     glucoseInfos = glucoseInfos.sorted("timestamp", true);
 
     return glucoseInfos[0];
 };
 
 export async function updateGlucose() {
-    const fromDate = readLatestGlucose().timestamp;
+    const latestGlucose = readLatestGlucose()
+
+    if (latestGlucose == null) // Checks if database is empty
+        return null
+
+    const fromDate = latestGlucose.timestamp;
     var result = await glucoseGET(fromDate);
 
     realm.write(() => {
         for (const glucoseInfo of result)
             realm.create("GlucoseInfo", { glucose: glucoseInfo.glucose, timestamp: glucoseInfo.timestamp });
     });
+
+    console.log("Database: Glucose updated")
 };
