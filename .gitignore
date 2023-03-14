@@ -1,7 +1,14 @@
-.vs/
+.vs
+my.realm
 my.realm.lock
 default.realm.management
 my.management
 my.realm.management
 node_modules
-obj/
+obj
+nuget.config
+package-lock.json
+database_test.esproj
+database_test.sln
+
+
