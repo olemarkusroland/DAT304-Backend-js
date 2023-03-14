@@ -1,5 +1,5 @@
 import Realm from 'realm';
-import { glucoseGET } from './nightscoutAPI.js'
+import { glucoseGET, insulinGET } from './nightscoutAPI.js'
 
 const User = {
     name: "User",
@@ -107,17 +107,64 @@ export function realmTest() {
 
 export function readLatestGlucose() {
     let glucoseInfos = realm.objects("GlucoseInfo");
+
+    if (glucoseInfos.isEmpty())
+        return null;
+
     glucoseInfos = glucoseInfos.sorted("timestamp", true);
 
     return glucoseInfos[0];
 };
 
+export function readLatestInsulin() {
+    let insulinInfos = realm.objects("InsulinInfo");
+
+    if (insulinInfos.isEmpty())
+        return null;
+
+    insulinInfos = insulinInfos.sorted("timestamp", true);
+
+    return insulinInfos[0];
+};
+
 export async function updateGlucose() {
-    const fromDate = readLatestGlucose().timestamp;
-    var result = await glucoseGET(fromDate);
+    const latestGlucose = readLatestGlucose()
+    
+    if (latestGlucose == null) {  // Checks if database is empty
+        const currentDate = new Date();
+        const fromDate = new Date(currentDate.setMonth(currentDate.getMonth() - 1));
+        var result = await glucoseGET(fromDate);
+    }
+    else {
+        const fromDate = latestGlucose.timestamp;
+        var result = await glucoseGET(fromDate);
+    }
+        
+        realm.write(() => {
+            for (const glucoseInfo of result)
+                realm.create("GlucoseInfo", { glucose: glucoseInfo.glucose, timestamp: glucoseInfo.timestamp });
+        });
+    
+    console.log("Database: Glucose updated")
+};
+
+export async function updateInsulin() {
+    const latestInsulin = readLatestInsulin();
+
+    if (latestInsulin == null) {  // Checks if database is empty
+        const currentDate = new Date();
+        const fromDate = new Date(currentDate.setMonth(currentDate.getMonth() - 1));
+        var result = await insulinGET(fromDate);
+    }
+    else {
+        const fromDate = latestInsulin.timestamp;
+        var result = await insulinGET(fromDate);
+    }
 
     realm.write(() => {
-        for (const glucoseInfo of result)
-            realm.create("GlucoseInfo", { glucose: glucoseInfo.glucose, timestamp: glucoseInfo.timestamp });
+        for (const insulinInfo of result)
+            realm.create("InsulinInfo", { insulin: insulinInfo.insulin, timestamp: insulinInfo.timestamp });
     });
-};
+
+    console.log("Database: Insulin updated")
+}

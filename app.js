@@ -1,4 +1,6 @@
-import { glucoseGET } from './nightscoutAPI.js'
-import { realmTest, readLatestGlucose, updateGlucose } from './realm.js'
+import { glucoseGET, insulinGET } from './nightscoutAPI.js'
+import { realmTest, readLatestGlucose, updateGlucose, readLatestInsulin, updateInsulin } from './realm.js'
 
-updateGlucose();
+//console.log(updateGlucose());
+//cosole.log(readLatestInsulin());
+console.log(updateInsulin());

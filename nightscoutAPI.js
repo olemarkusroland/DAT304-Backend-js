@@ -2,43 +2,14 @@ import https from 'https';
 
 const url = "https://oskarnightscoutweb1.azurewebsites.net";
 
-export function nightscoutTest() {
-    const url = "https://oskarnightscoutweb1.azurewebsites.net";
-    const order = "/api/v1/entries/sgv.json?find[dateString][$gte]=2023-01-28&find[dateString][$lte]=2023-02-1";
-
-    https.get(url + order, (res) => {
-        let data = '';
-
-        res.on('data', (chunk) => {
-            data += chunk;
-        });
-
-        res.on('end', () => {
-            const jsonData = JSON.parse(data);
-            console.log(jsonData);
-        });
-    }).on('error', (err) => {
-        console.error(err);
-    });
-}
-
-function parseISOString(s) {
-    var b = s.split(/\D+/);
-    return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
-}
-
 export async function glucoseGET(fromDate) {
-    console.log(fromDate);
     const currentDate = new Date();
+
+    let fromDatePlus = new Date(fromDate);
+    fromDatePlus.setMinutes(fromDatePlus.getMinutes() + 5);
+
+    const order = "/api/v1/entries/sgv.json?find[dateString][$gte]=" + fromDatePlus.toISOString() + "&find[dateString][$lte]=" + currentDate.toISOString() + "&count=all";
     
-    const test = parseISOString(fromDate)
-    console.log(test)
-
-    const fromDatePlus = new Date(test + 5 * 60000);
-    console.log(fromDatePlus);
-
-    const order = "/api/v1/entries/sgv.json?find[dateString][$gte]=" + fromDatePlus + "&find[dateString][$lte]=" + currentDate.toISOString() + "&count=all";
-
     return new Promise(function (resolve, reject) {
         https.get(url + order, (res) => {
             let data = '';
@@ -51,11 +22,44 @@ export async function glucoseGET(fromDate) {
                 const jsonData = JSON.parse(data);
                 let glucoseList = [];
 
-                for (const entry of jsonData) {
+                for (const entry of jsonData)
                     glucoseList.push({ glucose: entry.sgv, timestamp: entry.dateString });
-                };
 
                 resolve(glucoseList);
+            });
+        }).on('error', (err) => {
+            reject(err);
+        });
+    });
+}
+
+export async function insulinGET(fromDate) {
+    const currentDate = new Date();
+
+    let fromDatePlus = new Date(fromDate);
+    fromDatePlus.setMinutes(fromDatePlus.getMinutes() + 5);
+
+    const order = "/api/v1/treatments.json?find[created_at][$gte]=" + fromDatePlus.toISOString() + "&find[created_at][$lte]=" + currentDate.toISOString() + "&count=all"
+
+    return new Promise(function (resolve, reject) {
+        https.get(url + order, (res) => {
+            let data = '';
+
+            res.on('data', (chunk) => {
+                data += chunk;
+            });
+
+            res.on('end', () => {
+                const jsonData = JSON.parse(data);
+                let insulinList = [];
+
+                for (const entry of jsonData) {
+                    if (entry.eventType != "Exercise" && entry.insulin != null) {
+                        insulinList.push({ insulin: entry.insulin, timestamp: entry.created_at });
+                    }
+                }
+                console.log(insulinList[0].timestamp);
+                resolve(insulinList);
             });
         }).on('error', (err) => {
             reject(err);
